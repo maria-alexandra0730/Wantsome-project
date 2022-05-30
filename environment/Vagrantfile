@@ -1,0 +1,109 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$os_packages_update = <<SCRIPT
+export DEBIAN_FRONTEND=noninteractive
+echo "PLEASE WAIT, I am updating OS packages....."
+apt-get update -y && apt-get upgrade -y
+SCRIPT
+
+$jenkins_download_package = <<SCRIPT
+#!/bin/bash
+export DEBIAN_FRONTEND=noninteractive
+echo "PLEASE WAIT, I am installing Jenkins dependencies....."
+curl -fsSL https://pkg.jenkins.io/debian/jenkins.io.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null  
+echo "PLEASE WAIT, I am installing Jenkins....."
+apt-get update -y
+apt-get install fontconfig openjdk-11-jre -y
+apt-get install jenkins -y
+SCRIPT
+ 
+
+$jenkins_unlock_skip = <<SCRIPT
+#!/bin/bash
+echo "PLEASE WAIT, I am skipping the initial setup....."
+sudo cp -f /vagrant/jenkins/jenkins.service /lib/systemd/system/jenkins.service
+sudo cp -f /vagrant/jenkins/config.xml /var/lib/jenkins/config.xml
+sudo systemctl daemon-reload
+sudo service jenkins restart
+SCRIPT
+
+$jenkins_plugins = <<SCRIPT
+#!/bin/bash
+echo "PLEASE WAIT, I am installing the plugins....."
+sudo chmod +x /vagrant/jenkins/plugins.sh
+sudo bash /vagrant/jenkins/plugins.sh
+sudo service jenkins restart
+SCRIPT
+
+$add_privatekey = <<SCRIPT
+#!/bin/bash
+echo "PLEASE WAIT, I am copying the private key to Jenkins....."
+sudo mkdir /var/lib/jenkins/.ssh
+sudo cp -f /vagrant/jenkins/id_rsa /var/lib/jenkins/.ssh/
+sudo cp -f /vagrant/application/id_rsa.pub /var/lib/jenkins/.ssh/
+sudo chown jenkins:jenkins /var/lib/jenkins/.ssh/id_rsa
+sudo chmod 600 /var/lib/jenkins/.ssh/id_rsa
+SCRIPT
+
+$add_publickey = <<SCRIPT
+#!/bin/bash
+echo "PLEASE WAIT, I am copying the public key to Application server....."
+sudo cat /vagrant/application/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
+SCRIPT
+
+$docker_download_package = <<SCRIPT
+#!/bin/bash
+export DEBIAN_FRONTEND=noninteractive
+apt-get remove docker docker-engine docker.io containerd runc -y
+echo "PLEASE WAIT, I am installing Docker dependencies....."
+apt-get update -y
+apt-get install \
+  ca-certificates \
+  curl \
+  gnupg \
+  lsb-release -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg \
+  --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "PLEASE WAIT, I am installing Docker....."
+apt-get update -y
+apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+sudo docker network create wantsome
+SCRIPT
+
+$add_user_jenkins_to_docker = <<SCRIPT
+#!/bin/bash
+sudo usermod -a -G docker jenkins
+sudo service jenkins restart
+SCRIPT
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+
+  config.vm.define "jenkins" do |jks|
+    jks.vm.hostname = "jenkins"
+    jks.vm.network "private_network", ip: "192.168.56.10"
+    jks.vm.provision "shell", :inline => $os_packages_update
+    jks.vm.provision "shell", :inline => $jenkins_download_package
+    jks.vm.provision "shell", :inline => $jenkins_unlock_skip
+    jks.vm.provision "shell", :inline => $jenkins_plugins
+    jks.vm.provision "shell", :inline => $add_privatekey
+    jks.vm.provision "shell", :inline => $docker_download_package
+    jks.vm.provision "shell", :inline => $add_user_jenkins_to_docker
+  end
+   config.vm.define "application" do |app|
+    app.vm.hostname = "application"
+    app.vm.network "private_network", ip: "192.168.56.20"
+    app.vm.provision "shell", :inline => $os_packages_update
+    app.vm.provision "shell", :inline => $docker_download_package
+    app.vm.provision "shell", :inline => $add_publickey
+   end
+end

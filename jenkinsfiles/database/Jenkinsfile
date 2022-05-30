@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+
+    stages {
+        stage ('Deploy') {
+            steps {
+                 sh '''
+                 ssh -o StrictHostKeyChecking=no vagrant@192.168.56.20 '
+                 echo wantsomeproject | sudo docker login -u wantsomeproject --password-stdin
+                 sudo docker pull postgres:10.21-alpine
+                 sudo docker run --name drupal-postgres -d --network wantsome -p 5432:5432 -e  POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres postgres:10.21-alpine
+                 '
+                 '''
+            }
+        }
+    }
+}
