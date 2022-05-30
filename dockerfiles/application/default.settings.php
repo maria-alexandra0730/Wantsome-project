@@ -211,9 +211,9 @@ $databases = [];
  * @code
     $databases['default']['default'] = [
        'driver' => 'pgsql',
-       'database' => 'drupal',
-       'username' => 'drupal',
-       'password' => 'drupal',
+       'database' => 'postgres',
+       'username' => 'postgres',
+       'password' => 'postgres',
        'host' => 'drupal-postgres',
  *     'prefix' => '',
      ];
