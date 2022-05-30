@@ -6,6 +6,6 @@ RUN apt update && apt upgrade -y
 
 RUN apt install nginx -y
 
-COPY lb /etc/nginx/sites-available/default
+COPY dockerfiles/load_balancer/lb /etc/nginx/sites-available/default
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
