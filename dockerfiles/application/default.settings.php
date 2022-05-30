@@ -90,6 +90,17 @@
  */
 $databases = [];
 
+$databases['default']['default'] = [
+   'database' => 'postgres',
+   'username' => 'postgres',
+   'password' => 'postgres',
+   'host' => 'drupal-postgres',
+   'port' => '5432',
+   'driver' => 'pgsql',
+ *   'prefix' => '',
+ *   'collation' => 'utf8mb4_general_ci',
+ ];
+
 /**
  * Customizing database settings.
  *
