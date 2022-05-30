@@ -5,15 +5,15 @@ pipeline {
         stage ('Build image') {
             steps {
                 sh '''
-                sudo docker build -f dockerfile -t wantsomeproject/load_balancer:0.0.1 .
+                docker build -f dockerfiles/load_balancer/dockerfile -t wantsomeproject/load_balancer:0.0.1 .
                 '''
             }
         }
         stage ('Push to DockerHub') {
             steps {
                 sh '''
-                echo wantsomeproject | sudo docker login -u wantsomeproject --password-stdin
-                sudo docker push wantsomeproject/load_balancer:0.0.1
+                echo wantsomeproject | docker login -u wantsomeproject --password-stdin
+                docker push wantsomeproject/load_balancer:0.0.1
                 ''' 
             }
         }
