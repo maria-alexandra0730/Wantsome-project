@@ -209,14 +209,14 @@ $databases = [];
  *
  * Sample Database configuration format for PostgreSQL (pgsql):
  * @code
-    $databases['default']['default'] = [
-       'driver' => 'pgsql',
-       'database' => 'postgres',
-       'username' => 'postgres',
-       'password' => 'postgres',
-       'host' => 'drupal-postgres',
+ * $databases['default']['default'] = [
+ *     'driver' => 'pgsql',
+ *      'database' => 'postgres',
+ *      'username' => 'postgres',
+ *      'password' => 'postgres',
+ *      'host' => 'drupal-postgres',
  *     'prefix' => '',
-     ];
+ *   ];
  * @endcode
  *
  * Sample Database configuration format for SQLite (sqlite):
