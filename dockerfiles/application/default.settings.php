@@ -97,8 +97,8 @@ $databases['default']['default'] = [
    'host' => 'drupal-postgres',
    'port' => '5432',
    'driver' => 'pgsql',
- *   'prefix' => '',
- *   'collation' => 'utf8mb4_general_ci',
+   'prefix' => '',
+   'collation' => 'utf8mb4_general_ci',
  ];
 
 /**
