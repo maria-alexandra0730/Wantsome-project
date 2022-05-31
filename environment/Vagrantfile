@@ -62,9 +62,9 @@ echo "PLEASE WAIT, I am adding jenkins jobs....."
 sudo cp -rf /vagrant/jenkins/Application /var/lib/jenkins/jobs/
 sudo cp -rf /vagrant/jenkins/Database /var/lib/jenkins/jobs/
 sudo cp -rf /vagrant/jenkins/LoadBalancer /var/lib/jenkins/jobs/
-sudo chown jenkins:jenkins /var/lib/jenkins/jobs/Application
-sudo chown jenkins:jenkins /var/lib/jenkins/jobs/Database
-sudo chown jenkins:jenkins /var/lib/jenkins/jobs/LoadBalancer
+sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs/Application
+sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs/Database
+sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs/LoadBalancer
 SCRIPT
 
 $docker_download_package = <<SCRIPT
