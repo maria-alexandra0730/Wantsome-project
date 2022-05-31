@@ -65,6 +65,7 @@ sudo cp -rf /vagrant/jenkins/LoadBalancer /var/lib/jenkins/jobs/
 sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs/Application
 sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs/Database
 sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs/LoadBalancer
+sudo service jenkins restart
 SCRIPT
 
 $docker_download_package = <<SCRIPT
